@@ -34,9 +34,9 @@ function showResp(respMsg) {
   var resultArea = document.getElementById("result-area");
   resultArea.innerHTML = "";
   for (var i in respMsg) {
-    var curRes = respMsg[i]["highlight"]["row_content"][0];
-    var sourceVideo = respMsg[i]["_source"]["video_name"];
-    var startTime = respMsg[i]["_source"]["start_timestamp"];
+    var curRes = respMsg[i]["highlight"];
+    var sourceVideo = respMsg[i]["video_name"];
+    var startTime = respMsg[i]["start_timestamp"];
 
     var showRes = `
 			<li class="result-item">

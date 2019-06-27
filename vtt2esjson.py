@@ -1,11 +1,18 @@
 import os
 import json
+from elasticsearch import Elasticsearch
+from elasticsearch import helpers
+
+
+es = Elasticsearch('http://10.2.214.209:9200/')
 
 def convert(folder_path, file_path, video_name):
     convert_json = []
     with open(file_path, 'r') as vtt_file:
         line_no = 1
         all_lines = vtt_file.readlines()
+        actions = []
+
         while line_no < len(all_lines):
             try: 
                 index_line = {"index": {"_index": "transcript"}}
@@ -26,6 +33,11 @@ def convert(folder_path, file_path, video_name):
                 line_no = trim_blank_lines(all_lines, line_no)
                 cur_line['row_content'] = all_lines[line_no].strip('\n')
                 print(cur_line)
+                actions.append({
+                    "_index": "transcript",
+                    "_type": "_doc",
+                    "_source": cur_line
+                })
                 convert_json.append(cur_line)
             except:
                 pass
@@ -37,10 +49,14 @@ def convert(folder_path, file_path, video_name):
                 json_file.write(json.dumps(j))
                 json_file.write('\n')
 
+        helpers.bulk(es, actions)
+
+
 def trim_blank_lines(all_lines, line_no):
     while line_no < len(all_lines) and all_lines[line_no].strip() == '':
         line_no += 1
     return line_no
+
 
 if __name__ == "__main__":
     folder_path = "./Zoom Videos"
