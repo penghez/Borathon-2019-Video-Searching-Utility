@@ -1,5 +1,13 @@
 # Borathon 2019
 
+## How to run it?
+
+1. Save all your videos in `Zoom videos` folder;
+2. Go to `EK docker` folder, run `docker-compose up` to start your ES cluster;
+3. Run `python3 vtt2esjson.py` to insert all vtt files in ES;
+4. Go to `Flask Server` and start back-end service by `python3 app.py` (change the ip address of es of your own);
+5. The server will run on `localhost:6789`
+
 ## Briefly describe your idea:
 
 Utility App: Search and find specific words/phrases in a video (or a list of videos eg. confluence videos, youtube etc) and skip through to the relevant contents in the video. Meeting recordings tend to be long and its tedious to skip through it and find that one section you are looking for.
