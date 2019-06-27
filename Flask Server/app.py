@@ -157,6 +157,7 @@ def search():
     resp = es.search(index="transcript", doc_type="_doc", body=body)
 
     resp_for_tf = resp['hits']['hits']
+    print(resp_for_tf)
     resp_group_by_name = {}
     for resp_item in resp_for_tf:
         group_items = resp_group_by_name.get(resp_item['_source']['video_name'], [])
@@ -169,7 +170,7 @@ def search():
     video_name, sorted_result = get_video_and_time(keyword, resp_values)
     print(sorted_result)
 
-    resp = make_response(jsonify(sorted_result), 200)
+    resp = make_response(jsonify(resp_for_tf), 200)
     resp.headers.add("Access-Control-Allow-Origin", "*")
     resp.headers.add("Access-Control-Allow-Headers", "*")
     resp.headers.add("Access-Control-Allow-Methods", "*")
