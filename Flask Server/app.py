@@ -70,67 +70,65 @@ def get_video_and_time(query, json_list):
             query_vector[index] += 1
     query_vector /= max(np.sum(query_vector), 1)
     query_vector = np.multiply(query_vector, corpus_idf)
+
     max_similarity = 0
-    matching_doc = None
-    sim_array = []
-    for index in range(doc_matrix.shape[0]):
-        similarity = cosine_similarity(query_vector, doc_matrix[index])
-        sim_array.append(similarity)
-        if similarity > max_similarity:
-            max_similarity = similarity
-            matching_doc = index
-    if matching_doc is None:
-        return None, None
-
-    matching_video_id = matching_doc
-    corpus_index = {}
-    doc_matrix = []
-    for line_dict in trans_md[matching_doc]:
-        doc_vector = [0] * len(corpus_index)
-        for word in re.findall(r"[\w']+", line_dict["row_content"].lower()):
-            ##Assuming we don't deal with integer overflow for corpus size:p
-            corpus_index[word] = min(corpus_index.get(word, len(corpus_index) + 1), len(corpus_index))
-            if (len(doc_vector) < len(corpus_index)):
-                doc_vector.append(1)
-                for index in range(len(doc_matrix)):
-                    doc_matrix[index].append(0)
-            else:
-                doc_vector[corpus_index[word]] += 1
-        doc_vector = list(np.array(doc_vector) / np.sum(doc_vector))
-        doc_matrix.append(doc_vector)
-    doc_matrix = np.array(doc_matrix)
-
-    corpus_idf = []
-    for col in range(len(corpus_index)):
-        df = np.count_nonzero(doc_matrix[:, col])
-        idf = np.log(doc_matrix.shape[0] / df + 1)
-        corpus_idf.append(idf)
-        doc_matrix[:, col] *= idf
-
-    query_vector = np.zeros(len(corpus_index))
-    for word in re.findall(r"[\w']+", query.lower()):
-        index = corpus_index.get(word, None)
-        if index:
-            query_vector[index] += 1
-    query_vector /= max(np.sum(query_vector), 1)
-    query_vector = np.multiply(query_vector, corpus_idf)
-    # max_similarity = 0
-    # matching_dict_row = None
-    # sim_array = []
 
     results = []
     for index in range(doc_matrix.shape[0]):
         similarity = cosine_similarity(query_vector, doc_matrix[index])
         results.append((-similarity, index))
-    results = sorted(results)
-    # Getting the top results
-    results = results[:min(10, len(results))]
 
-    result_md = []
-    for _, result in results:
-        result_md.append(trans_md[matching_video_id][result])
+    results = sorted(results)[:min(10, len(results))]
 
-    return video_folder_names[matching_video_id], result_md
+    dict_results = {}
+    order = 1
+    for _, matching_video_id in results:
+        corpus_index = {}
+        doc_matrix = []
+        for line_dict in trans_md[matching_video_id]:
+            doc_vector = [0] * len(corpus_index)
+            for word in re.findall(r"[\w']+", line_dict["row_content"].lower()):
+                ##Assuming we don't deal with integer overflow for corpus size:p
+                corpus_index[word] = min(corpus_index.get(word, len(corpus_index) + 1), len(corpus_index))
+                if (len(doc_vector) < len(corpus_index)):
+                    doc_vector.append(1)
+                    for index in range(len(doc_matrix)):
+                        doc_matrix[index].append(0)
+                else:
+                    doc_vector[corpus_index[word]] += 1
+            doc_vector = list(np.array(doc_vector) / np.sum(doc_vector))
+            doc_matrix.append(doc_vector)
+        doc_matrix = np.array(doc_matrix)
+
+        corpus_idf = []
+        for col in range(len(corpus_index)):
+            df = np.count_nonzero(doc_matrix[:, col])
+            idf = np.log(doc_matrix.shape[0] / df + 1)
+            corpus_idf.append(idf)
+            doc_matrix[:, col] *= idf
+
+        query_vector = np.zeros(len(corpus_index))
+        for word in re.findall(r"[\w']+", query.lower()):
+            index = corpus_index.get(word, None)
+            if index:
+                query_vector[index] += 1
+        query_vector /= max(np.sum(query_vector), 1)
+        query_vector = np.multiply(query_vector, corpus_idf)
+
+        results = []
+        for index in range(doc_matrix.shape[0]):
+            similarity = cosine_similarity(query_vector, doc_matrix[index])
+            results.append((-similarity, index))
+
+        results = sorted(results)[:min(5, len(results))]
+        result_md = []
+        for _, result in results:
+            result_md.append(trans_md[matching_video_id][result])
+
+        dict_results[str(order)] = {"video_name": video_folder_names[matching_video_id], "time_list": result_md}
+        order += 1
+
+    return dict_results
 
 
 @app.route("/search", methods=['GET', 'POST'])
@@ -166,7 +164,7 @@ def search():
         resp_group_by_name[resp_item['_source']['video_name']] = group_items
 
     resp_values = list(resp_group_by_name.values())
-    video_name, sorted_result = get_video_and_time(keyword, resp_values)
+    sorted_result = get_video_and_time(keyword, resp_values)
     print(sorted_result)
 
     resp = make_response(jsonify(sorted_result), 200)
