@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Borathon Test</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <script type="text/javascript" src="assets/js/action.js"></script>
+  </head>
+
+  <body>
+    <div class="outer-box">
+      <div class="search-input">
+        <input
+          type="text"
+          class="type-area"
+          id="input-text"
+          onkeypress="enterPress(event)"
+        />
+        <input
+          type="button"
+          value="SEARCH"
+          class="send-btn"
+          id="send-query"
+          onclick="sendMessage()"
+        />
+      </div>
+
+      <div class="result-area">
+        <ul id="result-area"></ul>
+      </div>
+    </div>
+  </body>
+</html>
