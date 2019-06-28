@@ -10,11 +10,11 @@ html {
 }
 
 .type-area {
-  width: 81%;
+  width: 85%;
   height: 35px;
   padding: 0px;
   float: left;
-  margin-left: 10px;
+  margin-left: 20px;
   outline: none;
   font-size: 16px;
   text-indent: 10px;
@@ -23,7 +23,7 @@ html {
 }
 
 .send-btn {
-  width: 13%;
+  width: 11%;
   height: 35px;
   float: left;
   margin-left: 10px;
@@ -44,6 +44,13 @@ html {
 
 .result-area {
   height: 520px;
+  margin: 10px auto 0;
+  overflow: auto;
+}
+
+.video-area {
+  height: 520px;
+  padding-left: 0px;
   margin: 10px auto 0;
   overflow: auto;
 }

@@ -21,14 +21,16 @@ window.onload = function() {
   var videoArea = document.getElementById("video-area");
   for (var i = 0; i < 5; i += 1) {
     var videoItem = `
-      <div class="list-group-item list-group-item-action">
-        <video width="500" height="400" controls>
+      <div class="list-group-item list-group-item-dark">
+        ${videoPath[i].split("/")[2]}
+      </div>
+      <div class="list-group-item">
+        <video width="400" height="250" controls>
           <source
             src="${videoPath[i]}"
             type="video/mp4"
           />
         </video>
-        ${videoPath[i]}
       </div>
     `;
     videoArea.innerHTML += videoItem;
@@ -74,6 +76,15 @@ function showResp(respMsg) {
     var videoName = respMsg[i]["video_name"];
     var timeList = respMsg[i]["time_list"];
     // console.log(timeList);
+    var videoTitleBar = `
+      <li class="list-group-item list-group-item-primary">
+        <div>
+          Source video: <b> ${videoName} </b>
+        </div>
+      </li>
+    `;
+    resultArea.innerHTML += videoTitleBar;
+
     for (var j in timeList) {
       var curRes = timeList[j]["highlight"];
       var startTime = timeList[j]["start_timestamp"];
@@ -83,10 +94,7 @@ function showResp(respMsg) {
           onclick="goToVideo(id)"
           class="list-group-item list-group-item-action result-item"
           id="${videoName}##${startTime}"
-        >
-          <div>
-            Source video: <b> ${videoName} </b>
-          </div>
+        >      
           <div>
             Appeared timestamp: ${startTime}
           </div>
@@ -130,7 +138,7 @@ function goToVideo(idStr) {
             type="video/mp4"
           />
         </video>
-        ${videoPath[i]}
+        ${videoPath[i].split("/")[2]}
       </div>
       `;
     }
