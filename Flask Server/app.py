@@ -9,7 +9,7 @@ import re
 from numpy import linalg as LA
 
 app = Flask(__name__)
-es = Elasticsearch('http://10.2.214.209:9200/')
+es = Elasticsearch('http://localhost:9200/')
 
 @app.route("/")
 def index():
