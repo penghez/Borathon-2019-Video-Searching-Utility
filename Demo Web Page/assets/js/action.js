@@ -60,7 +60,10 @@ function getResponseFromEs(inputText) {
       if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
         // alert("Fetching results from Elasticsearch...");
         var respMsg = JSON.parse(xhr.response);
-        // console.log(respMsg);
+        console.log(respMsg);
+        if (Object.keys(respMsg).length === 0 || respMsg.length === 0) {
+          alert("Didn't find such keywords in current videos.");
+        }
         showResp(respMsg);
       }
     }

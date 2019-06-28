@@ -8,12 +8,15 @@ import ast
 import re
 from numpy import linalg as LA
 
+from query_preprocessing import expand_query
+
 app = Flask(__name__)
 es = Elasticsearch('http://localhost:9200/')
 
 @app.route("/")
 def index():
-    return "hello"
+    return expand_query("securit")
+    # return "hello"
 
 
 @app.route("/info")
@@ -134,24 +137,33 @@ def get_video_and_time(query, json_list):
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     keyword = request.form['keyword']
+    keyword = expand_query(keyword)
     print(keyword)
+    # body = {
+    #     "query": {
+    #         "bool": {
+    #             "must": {
+    #                 "multi-match": {
+    #                     "query": keyword,
+    #                     "fuzziness": "2",
+    #                     "fields": ["row_content"],
+    #                     "minimum_should_match": "80%",
+    #                     "type": "most_fields"
+    #                 }
+    #             }
+    #         }
+    #     },
+    #     "highlight": { "fields": { "row_content": { "pre_tags" : ["<mark>"], "post_tags" : ["</mark>"] } } }
+    # }
+
     body = {
         "query": {
-            "bool": {
-                "must": {
-                    "multi_match": {
-                        "query": keyword,
-                        "fuzziness": "1",
-                        "fields": ["row_content"],
-                        "minimum_should_match": "80%",
-                        "type": "most_fields"
-                    }
-                }
+            "match": {
+                "row_content": keyword
             }
         },
         "highlight": { "fields": { "row_content": { "pre_tags" : ["<mark>"], "post_tags" : ["</mark>"] } } }
     }
-
     resp = es.search(index="transcript", doc_type="_doc", body=body)
 
     resp_for_tf = resp['hits']['hits']
@@ -166,7 +178,7 @@ def search():
 
     resp_values = list(resp_group_by_name.values())
     sorted_result = get_video_and_time(keyword, resp_values)
-    print(sorted_result)
+    # print(sorted_result)
 
     resp = make_response(jsonify(sorted_result), 200)
     resp.headers.add("Access-Control-Allow-Origin", "*")
