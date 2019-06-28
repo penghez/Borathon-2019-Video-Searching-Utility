@@ -137,37 +137,37 @@ def get_video_and_time(query, json_list):
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     keyword = request.form['keyword']
-    keyword = expand_query(keyword)
+    # keyword = expand_query(keyword)
     print(keyword)
-    # body = {
-    #     "query": {
-    #         "bool": {
-    #             "must": {
-    #                 "multi-match": {
-    #                     "query": keyword,
-    #                     "fuzziness": "2",
-    #                     "fields": ["row_content"],
-    #                     "minimum_should_match": "80%",
-    #                     "type": "most_fields"
-    #                 }
-    #             }
-    #         }
-    #     },
-    #     "highlight": { "fields": { "row_content": { "pre_tags" : ["<mark>"], "post_tags" : ["</mark>"] } } }
-    # }
-
     body = {
         "query": {
-            "match": {
-                "row_content": keyword
+            "bool": {
+            "must": {
+                "multi_match": {
+                    "query": keyword,
+                    "fuzziness": "5",
+                    "fields": ["row_content"],
+                    "minimum_should_match": "65%",
+                    "type": "most_fields"
+                }
+            }
             }
         },
         "highlight": { "fields": { "row_content": { "pre_tags" : ["<mark>"], "post_tags" : ["</mark>"] } } }
     }
+
+    # body = {
+    #     "query": {
+    #         "match": {
+    #             "row_content": keyword
+    #         }
+    #     },
+    #     "highlight": { "fields": { "row_content": { "pre_tags" : ["<mark>"], "post_tags" : ["</mark>"] } } }
+    # }
     resp = es.search(index="transcript", doc_type="_doc", body=body)
 
     resp_for_tf = resp['hits']['hits']
-    print(resp_for_tf)
+    # print(resp_for_tf)
     resp_group_by_name = {}
     for resp_item in resp_for_tf:
         group_items = resp_group_by_name.get(resp_item['_source']['video_name'], [])

@@ -51,7 +51,7 @@ function sendMessage() {
 
 function getResponseFromEs(inputText) {
   var xhr = new XMLHttpRequest();
-  var url = "http://localhost:6789/search";
+  var url = "http://10.2.214.209:6789/search";
   var params = new FormData();
   params.append("keyword", inputText);
 
