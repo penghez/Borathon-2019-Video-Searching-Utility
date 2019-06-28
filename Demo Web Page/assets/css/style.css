@@ -4,12 +4,6 @@ html {
   background-color: #ebe9e9;
 }
 
-.outer-box {
-  width: 60%;
-  height: 600px;
-  margin: 20px auto 0;
-}
-
 .search-input {
   width: 95%;
   margin: 16px auto 0;
@@ -49,13 +43,15 @@ html {
 }
 
 .result-area {
-  width: 93%;
   height: 520px;
-  margin: 60px auto 0;
+  margin: 10px auto 0;
   overflow: auto;
-  border-radius: 12px;
 }
 
 .result-item:hover {
   transform: scale(1.03);
+}
+
+.text-center {
+  text-align: center;
 }
